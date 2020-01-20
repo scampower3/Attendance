@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using NLog;
+using Emgu.CV.Face;
 using Emgu.CV.Structure;
 using Emgu.CV;
 using System.Runtime.InteropServices;
@@ -31,6 +33,13 @@ namespace Attendance
         private CascadeClassifier Frontface_Cascade;
         private CascadeClassifier EyeGlass_Cascade;
         DispatcherTimer timer;
+        Image<Gray,Byte> result, TrainedFace = null;
+        Image<Gray, Byte> gray = null;
+        List<Image<Gray,Byte>> trainingImages = new List<Image<Gray,Byte>>();
+        List<string> labels = new List<string>();
+        List<string> NamePersons = new List<string>();
+        int ContTrain, NumLabels, t;
+        string name, names = null;
 
         public MainWindow()
         {
@@ -58,9 +67,93 @@ namespace Attendance
                 var detectedFaces = Frontface_Cascade.DetectMultiScale(grayFrame);
                 var detectedFaces2 = EyeGlass_Cascade.DetectMultiScale(grayFrame);
 
+                try
+                {
+                    //Load of previus trainned faces and labels for each image
+                    string Labelsinfo = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "/TrainedFaces/TrainedLabels.txt");
+                    logger.Info(Labelsinfo);
+                    string[] Labels = Labelsinfo.Split('%');
+                    NumLabels = Convert.ToInt16(Labels[0]);
+                    ContTrain = NumLabels;
+                    string LoadFaces;
+
+                    for (int tf = 1; tf < NumLabels + 1; tf++)
+                    {
+                        LoadFaces = "face" + tf + ".bmp";
+                        trainingImages.Add(new Image<Gray, Byte>(AppDomain.CurrentDomain.BaseDirectory + "/TrainedFaces/" + LoadFaces));
+                        labels.Add(Labels[tf]);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //MessageBox.Show(e.ToString());
+                    logger.Warn(ex);
+                    MessageBox.Show("Nothing in binary database, please add at least a face", "Trained faces load");
+                }
+                try
+                {
+                    //Trained face counter
+                    ContTrain = ContTrain + 1;
+
+                    //Get a gray frame from capture device
+                    gray = capture.QueryFrame().ToImage<Gray, Byte>();
+
+                    //Face Detector
+                    var facesDetected = Frontface_Cascade.DetectMultiScale(gray, 1.2, 19, System.Drawing.Size.Empty, System.Drawing.Size.Empty);
+                    //Action for each element detected
+                    foreach (var f in facesDetected)
+                    {
+                        TrainedFace = currentFrame.Copy(f).Convert<Gray,Byte>();
+                        break;
+                    }
+
+                    //resize face detected image for force to compare the same size with the
+                    //test image with cubic interpolation type method
+                    1
+                    trainingImages.Add(TrainedFace);
+                    labels.Add(textbox1.Text);
+
+                    //Show face added in gray scale
+                    
+
+                    //Write the number of triained faces in a file text for further load
+                    File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "/TrainedFaces/TrainedLabels.txt", trainingImages.ToArray().Length.ToString() + "%");
+
+                    //Write the labels of triained faces in a file text for further load
+                    for (int i = 1; i < trainingImages.ToArray().Length + 1; i++)
+                    {
+                        trainingImages.ToArray()[i - 1].Save(AppDomain.CurrentDomain.BaseDirectory + "/TrainedFaces/face" + i + ".bmp");
+                        File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + "/TrainedFaces/TrainedLabels.txt", labels.ToArray()[i - 1] + "%");
+                    }
+
+                    MessageBox.Show(textbox1.Text + "´s face detected and added :)", "Training OK");
+                }
+                catch (Exception ex)
+                {
+                    logger.Warn(ex);
+                    MessageBox.Show("Enable the face detection first", "Training Fail");
+                }
                 foreach (var face in detectedFaces)
                 {
+                    t = t + 1;
+                    result = grayFrame.Copy(face);
+                    //draw the face detected in the 0th (gray) channel with blue color
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);
+
+                    if (trainingImages.ToArray().Length != 0)
+                    {
+                        //TermCriteria for face recognition with numbers of trained images like maxIteration
+                        MCvTermCriteria termCrit = new MCvTermCriteria(ContTrain, 0.001);
+
+                        //Eigen face recognizer
+                        EigenFaceRecognizer recognizer = new EigenFaceRecognizer(1,5000);
+                        //recognizer.Train(trainingImages.ToArray(), labels.ToArray());
+                        //name = recognizer.Predict(result).ToString();
+
+                        //Draw the label for each face detected and recognized
+                        textbox1.Text = name;
+                    }
+                        
                     logger.Info("Drawing Rectangle Outline of Face");
                 }
                 foreach (var face in detectedFaces2)
@@ -93,6 +186,6 @@ namespace Attendance
                 return bs;
             }
         }
-
     }
+
 }
