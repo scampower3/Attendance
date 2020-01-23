@@ -78,7 +78,6 @@ namespace Attendance
                             var image = ByteToImage(blob);
                             Image<Gray, Byte> newImage = new Image<Gray, Byte>(image);
                             trainingImages.Add(newImage);
-                            image1.Source = ToBitmapSource(newImage);
                         }
                     }
                 }
@@ -195,23 +194,6 @@ namespace Attendance
         private static extern int DeleteObject(IntPtr o);
 
         public static BitmapSource ToBitmapSource(Image<Bgr, Byte> image)
-        {
-            using (System.Drawing.Bitmap source = image.Bitmap)
-            {
-                IntPtr ptr = source.GetHbitmap(); //obtain the Hbitmap  
-
-                BitmapSource bs = System.Windows.Interop
-                  .Imaging.CreateBitmapSourceFromHBitmap(
-                  ptr,
-                  IntPtr.Zero,
-                  Int32Rect.Empty,
-                  System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-
-                DeleteObject(ptr); //release the HBitmap  
-                return bs;
-            }
-        }
-        public static BitmapSource ToBitmapSource(Image<Gray, Byte> image)
         {
             using (System.Drawing.Bitmap source = image.Bitmap)
             {
