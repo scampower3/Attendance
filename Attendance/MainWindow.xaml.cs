@@ -19,7 +19,9 @@ using Emgu.CV.Structure;
 using Emgu.CV;
 using System.Runtime.InteropServices;
 using System.Windows.Threading;
+using System.Data.SqlClient;
 using System.Drawing;
+using System.Configuration;
 
 namespace Attendance
 {
@@ -59,6 +61,29 @@ namespace Attendance
 
         void timer_Tick(object sender, EventArgs e)
         {
+            var connectionstring = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
+            using(SqlConnection connection = new SqlConnection(connectionstring))
+            {
+                connection.Open();
+                string query = "SELECT * FROM Attendance.dbo.TrainingData";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            labels.Add(reader.GetString(0));
+                            byte[] blob = null;
+                            blob = (byte[])reader.GetValue(2);
+                            var image = ByteToImage(blob);
+                            Image<Gray, Byte> newImage = new Image<Gray, Byte>(image);
+                            trainingImages.Add(newImage);
+                            image1.Source = ToBitmapSource(newImage);
+                        }
+                    }
+                }
+
+            }
             Image<Bgr, Byte> currentFrame = capture.QueryFrame().ToImage<Bgr,Byte>();
             if (currentFrame != null)
             {
@@ -109,7 +134,7 @@ namespace Attendance
 
                     //resize face detected image for force to compare the same size with the
                     //test image with cubic interpolation type method
-                    1
+                    
                     trainingImages.Add(TrainedFace);
                     labels.Add(textbox1.Text);
 
@@ -185,6 +210,34 @@ namespace Attendance
                 DeleteObject(ptr); //release the HBitmap  
                 return bs;
             }
+        }
+        public static BitmapSource ToBitmapSource(Image<Gray, Byte> image)
+        {
+            using (System.Drawing.Bitmap source = image.Bitmap)
+            {
+                IntPtr ptr = source.GetHbitmap(); //obtain the Hbitmap  
+
+                BitmapSource bs = System.Windows.Interop
+                  .Imaging.CreateBitmapSourceFromHBitmap(
+                  ptr,
+                  IntPtr.Zero,
+                  Int32Rect.Empty,
+                  System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+
+                DeleteObject(ptr); //release the HBitmap  
+                return bs;
+            }
+        }
+
+        public static Bitmap ByteToImage(byte[] blob)
+        {
+            MemoryStream mStream = new MemoryStream();
+            byte[] pData = blob;
+            mStream.Write(pData, 0, Convert.ToInt32(pData.Length));
+            Bitmap bm = new Bitmap(mStream, false);
+            mStream.Dispose();
+            return bm;
+
         }
     }
 
