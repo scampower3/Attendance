@@ -42,7 +42,7 @@ namespace Attendance
         List<string> NamePersons = new List<string>();
         int ContTrain, NumLabels, t;
         string name, names = null;
-
+        EigenFaceRecognizer recognizer;
         public MainWindow()
         {
             InitializeComponent();
@@ -72,11 +72,14 @@ namespace Attendance
                     {
                         while (reader.Read())
                         {
+                            labels.Clear();
+                            trainingImages.Clear();
                             labels.Add(reader.GetString(0));
                             byte[] blob = null;
                             blob = (byte[])reader.GetValue(2);
                             var image = ByteToImage(blob);
                             Image<Gray, Byte> newImage = new Image<Gray, Byte>(image);
+                            ContTrain++;
                             trainingImages.Add(newImage);
                         }
                     }
@@ -89,11 +92,10 @@ namespace Attendance
 
                 var detectedFaces = Frontface_Cascade.DetectMultiScale(grayFrame);
                 var detectedFaces2 = EyeGlass_Cascade.DetectMultiScale(grayFrame);
+                recognizer = new EigenFaceRecognizer(ContTrain, 5000);
+                //recognizer.Train(trainingImages.ToArray(), trainingImages.ToArray());
                 foreach (var face in detectedFaces)
-                {
-                    t = t + 1;
-                    result = grayFrame.Copy(face);
-                    //draw the face detected in the 0th (gray) channel with blue color
+                {   
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);                        
                     logger.Info("Drawing Rectangle Outline of Face");
                 }
