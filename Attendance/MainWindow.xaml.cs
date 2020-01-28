@@ -93,7 +93,7 @@ namespace Attendance
                 var detectedFaces = Frontface_Cascade.DetectMultiScale(grayFrame);
                 var detectedFaces2 = EyeGlass_Cascade.DetectMultiScale(grayFrame);
                 recognizer = new EigenFaceRecognizer(ContTrain, 5000);
-                //recognizer.Train(trainingImages.ToArray(), trainingImages.ToArray());
+                recognizer.Train(trainingImages.ToArray(), labels.ToArray());
                 foreach (var face in detectedFaces)
                 {   
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);                        
