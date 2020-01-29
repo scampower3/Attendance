@@ -38,7 +38,7 @@ namespace Attendance
         Image<Gray,Byte> result, TrainedFace = null;
         Image<Gray, Byte> gray = null;
         List<Image<Gray,Byte>> trainingImages = new List<Image<Gray,Byte>>();
-        List<string> labels = new List<string>();
+        List<int> labels = new List<int>();
         List<string> NamePersons = new List<string>();
         int ContTrain, NumLabels, t;
         string name, names = null;
@@ -72,15 +72,17 @@ namespace Attendance
                     {
                         while (reader.Read())
                         {
-                            labels.Clear();
+                            NamePersons.Clear();
                             trainingImages.Clear();
-                            labels.Add(reader.GetString(0));
+                            labels.Clear();
+                            NamePersons.Add(reader.GetString(0));
                             byte[] blob = null;
                             blob = (byte[])reader.GetValue(2);
                             var image = ByteToImage(blob);
                             Image<Gray, Byte> newImage = new Image<Gray, Byte>(image);
-                            ContTrain++;
                             trainingImages.Add(newImage);
+                            labels.Add(ContTrain);
+                            ContTrain++;
                         }
                     }
                 }
@@ -93,11 +95,28 @@ namespace Attendance
                 var detectedFaces = Frontface_Cascade.DetectMultiScale(grayFrame);
                 var detectedFaces2 = EyeGlass_Cascade.DetectMultiScale(grayFrame);
                 recognizer = new EigenFaceRecognizer(ContTrain, 5000);
-                recognizer.Train(trainingImages.ToArray(), labels.ToArray());
+
+                Mat[] faceImages = new Mat[trainingImages.Count];
+                int[] faceLabels = new int[labels.Count];
+
+                for (int i = 0; i < trainingImages.Count; i++)
+                {
+                    Mat x = trainingImages[i].Mat;
+                    faceImages[i] = x;
+                }
+
+                for (int i = 0; i < labels.Count; i++)
+                {
+                    faceLabels = labels.ToArray();
+                }
+                recognizer.Train(faceImages, faceLabels);
+
+                logger.Info("Training Face Recognizer");
                 foreach (var face in detectedFaces)
                 {   
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);                        
                     logger.Info("Drawing Rectangle Outline of Face");
+                    textbox1.Text = recognizer.Predict(currentFrame.Mat).ToString();
                 }
                 foreach (var face in detectedFaces2)
                 {
