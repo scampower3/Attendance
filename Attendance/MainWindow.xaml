@@ -8,7 +8,7 @@
         Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
         <Image Name="image1" Stretch="Fill" Margin="0,0,162.6,62" />
-        <TextBox Name ="textbox1"  HorizontalAlignment="Left" Height="23" Margin="355,358,0,0" TextWrapping="Wrap" Text="Lee Jun Quan" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name ="textbox1"  HorizontalAlignment="Left" Height="23" Margin="355,358,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
 
     </Grid>
 </Window>

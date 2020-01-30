@@ -82,7 +82,7 @@ namespace Attendance
                             Image<Gray, Byte> newImage = new Image<Gray, Byte>(image);
                             trainingImages.Add(newImage);
                             labels.Add(ContTrain);
-                            ContTrain++;
+                            
                         }
                     }
                 }
@@ -91,17 +91,22 @@ namespace Attendance
             if (currentFrame != null)
             {
                 Image<Gray, Byte> grayFrame = currentFrame.Convert<Gray, Byte>();
-
                 var detectedFaces = Frontface_Cascade.DetectMultiScale(grayFrame);
                 var detectedFaces2 = EyeGlass_Cascade.DetectMultiScale(grayFrame);
-                recognizer = new EigenFaceRecognizer(ContTrain, 5000);
+                recognizer = new EigenFaceRecognizer(1, 5000);
 
                 Mat[] faceImages = new Mat[trainingImages.Count];
                 int[] faceLabels = new int[labels.Count];
 
                 for (int i = 0; i < trainingImages.Count; i++)
                 {
-                    Mat x = trainingImages[i].Mat;
+                    var face = Frontface_Cascade.DetectMultiScale(trainingImages[i]);
+                    foreach (var Tface in detectedFaces)
+                    {
+                        trainingImages[i].ROI = Tface;
+                    }
+                    gray = trainingImages[i].Clone().Resize(60,60,0);
+                     Mat x = gray.Mat;
                     faceImages[i] = x;
                 }
 
@@ -110,13 +115,13 @@ namespace Attendance
                     faceLabels = labels.ToArray();
                 }
                 recognizer.Train(faceImages, faceLabels);
-
                 logger.Info("Training Face Recognizer");
                 foreach (var face in detectedFaces)
-                {   
+                {
+                    grayFrame.ROI = face;
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);                        
                     logger.Info("Drawing Rectangle Outline of Face");
-                    textbox1.Text = recognizer.Predict(currentFrame.Mat).ToString();
+                    textbox1.Text = NamePersons[recognizer.Predict(grayFrame.Resize(60,60,0)).Label];
                 }
                 foreach (var face in detectedFaces2)
                 {
