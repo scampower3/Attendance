@@ -53,16 +53,8 @@ namespace Attendance
             capture = new VideoCapture();
             Frontface_Cascade = new CascadeClassifier(@"haarcascades/haarcascade_frontalface_default.xml");
             EyeGlass_Cascade = new CascadeClassifier(@"haarcascades/haarcascade_eye_tree_eyeglasses.xml");
-            timer = new DispatcherTimer();
-            timer.Tick += new EventHandler(timer_Tick);
-            timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
-            timer.Start();
-        }
-
-        void timer_Tick(object sender, EventArgs e)
-        {
             var connectionstring = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
-            using(SqlConnection connection = new SqlConnection(connectionstring))
+            using (SqlConnection connection = new SqlConnection(connectionstring))
             {
                 connection.Open();
                 string query = "SELECT * FROM Attendance.dbo.TrainingData";
@@ -72,21 +64,33 @@ namespace Attendance
                     {
                         while (reader.Read())
                         {
-                            NamePersons.Clear();
-                            trainingImages.Clear();
-                            labels.Clear();
+                            if (!NamePersons.Any() || NamePersons[ContTrain] == reader.GetString(0))
+                            {
+                                labels.Add(NumLabels);
+                            }
+                            else
+                            {
+                                NumLabels++;
+                                labels.Add(NumLabels);
+                            }
                             NamePersons.Add(reader.GetString(0));
                             byte[] blob = null;
                             blob = (byte[])reader.GetValue(2);
                             var image = ByteToImage(blob);
                             Image<Gray, Byte> newImage = new Image<Gray, Byte>(image);
                             trainingImages.Add(newImage);
-                            labels.Add(ContTrain);
-                            
                         }
                     }
                 }
             }
+            timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(timer_Tick);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
+            timer.Start();
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
             Image<Bgr, Byte> currentFrame = capture.QueryFrame().ToImage<Bgr,Byte>();
             if (currentFrame != null)
             {
