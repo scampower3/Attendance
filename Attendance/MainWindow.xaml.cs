@@ -57,7 +57,7 @@ namespace Attendance
             using (SqlConnection connection = new SqlConnection(connectionstring))
             {
                 connection.Open();
-                string query = "SELECT * FROM Attendance.dbo.TrainingData";
+                string query = "SELECT * FROM Attendance.dbo.TrainingData Order by StudentID";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -109,7 +109,7 @@ namespace Attendance
                     {
                         trainingImages[i].ROI = Tface;
                     }
-                    gray = trainingImages[i].Clone().Resize(60,60,0);
+                    gray = trainingImages[i].Clone().Resize(200,200,0);
                      Mat x = gray.Mat;
                     faceImages[i] = x;
                 }
@@ -125,7 +125,7 @@ namespace Attendance
                     grayFrame.ROI = face;
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);                        
                     logger.Info("Drawing Rectangle Outline of Face");
-                    textbox1.Text = NamePersons[recognizer.Predict(grayFrame.Resize(60,60,0)).Label];
+                    textbox1.Text = NamePersons[recognizer.Predict(grayFrame.Resize(200,200,0)).Label];
                 }
                 foreach (var face in detectedFaces2)
                 {
