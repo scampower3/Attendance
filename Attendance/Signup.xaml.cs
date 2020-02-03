@@ -31,9 +31,9 @@ namespace Attendance
         {
             string password = Password.Text;
             string username = Username.Text;
-            string MatchEmailPattern = "^[a-zA-Z0-9]+$";
+            string MatchPasswordPattern = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$";
 
-            if (password != "" && username != "" && Regex.IsMatch(password, MatchEmailPattern) == true)
+            if (password != "" && username != "" && Regex.IsMatch(password, MatchPasswordPattern) == true)
             {
                 string salt = RandomString(32);
                 Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 100000);
