@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -38,10 +40,34 @@ namespace Attendance
 
             if (password != "" && username != "")
             {
-                string salt = RandomString(32);
-                Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 100000);
-                string hash = Convert.ToBase64String(pbkdf2.GetBytes(32));
-                this.NavigationService.Navigate(new FaceRecognition());
+                var connectionstring = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
+                using (SqlConnection connection = new SqlConnection(connectionstring))
+                {
+                    connection.Open();
+                    string query = "SELECT * FROM Attendance.dbo.USERS";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            bool match= false;
+                            while (reader.Read())
+                            {
+                                string salt = reader.GetString(2);
+                                Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 100000);
+                                string hash = Convert.ToBase64String(pbkdf2.GetBytes(32));
+                                if (hash == reader.GetString(1) && username == reader.GetString(0))
+                                {
+                                    match = true;
+                                    this.NavigationService.Navigate(new FaceRecognition());
+                                }
+                            }
+                            if(match == false)
+                            {
+                                MessageBox.Show("Account not found");
+                            }
+                        }
+                    }
+                }
             }
             else if (password == "" || username == "")
             {
