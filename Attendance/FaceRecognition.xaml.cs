@@ -52,7 +52,6 @@ namespace Attendance
         {
             capture = new VideoCapture();
             Frontface_Cascade = new CascadeClassifier(@"haarcascades/haarcascade_frontalface_default.xml");
-            EyeGlass_Cascade = new CascadeClassifier(@"haarcascades/haarcascade_eye_tree_eyeglasses.xml");
             var connectionstring = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
             using (SqlConnection connection = new SqlConnection(connectionstring))
             {
@@ -96,7 +95,6 @@ namespace Attendance
             {
                 Image<Gray, Byte> grayFrame = currentFrame.Convert<Gray, Byte>();
                 var detectedFaces = Frontface_Cascade.DetectMultiScale(grayFrame);
-                var detectedFaces2 = EyeGlass_Cascade.DetectMultiScale(grayFrame);
                 recognizer = new EigenFaceRecognizer(1, 5000);
 
                 Mat[] faceImages = new Mat[trainingImages.Count];
@@ -126,11 +124,6 @@ namespace Attendance
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);                        
                     logger.Info("Drawing Rectangle Outline of Face");
                     textbox1.Text = NamePersons[recognizer.Predict(grayFrame.Resize(200,200,0)).Label];
-                }
-                foreach (var face in detectedFaces2)
-                {
-                    currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);
-                    logger.Info("Drawing Rectangle Outline of Eyeglasses");
                 }
 
                 image1.Source = ToBitmapSource(currentFrame);
