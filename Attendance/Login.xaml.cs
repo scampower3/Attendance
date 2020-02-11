@@ -35,7 +35,7 @@ namespace Attendance
 
         private void Signin_Click(object sender, RoutedEventArgs e)
         {
-            string password = Password.Text;
+            string password = Password.Password;
             string username = Username.Text;
 
             if (password != "" && username != "")

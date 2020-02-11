@@ -35,7 +35,7 @@ namespace Attendance
 
         private void CreateUser_Click(object sender, RoutedEventArgs e)
         {
-            string password = Password.Text;
+            string password = Password.Password;
             string username = Username.Text;
             string MatchPasswordPattern = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$";
 
