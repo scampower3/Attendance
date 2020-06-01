@@ -74,6 +74,30 @@ namespace Attendance
                     }
                 }
             }
+
+            recognizer = new EigenFaceRecognizer(1, 5000);
+
+            Mat[] faceImages = new Mat[trainingImages.Count];
+            int[] faceLabels = new int[labels.Count];
+
+            for (int i = 0; i < trainingImages.Count; i++)
+            {
+                var face = Frontface_Cascade.DetectMultiScale(trainingImages[i]);
+                foreach (var Tface in face)
+                {
+                    trainingImages[i].ROI = Tface;
+                }
+                gray = trainingImages[i].Clone().Resize(200, 200, 0);
+                Mat x = gray.Mat;
+                faceImages[i] = x;
+            }
+
+            for (int i = 0; i < labels.Count; i++)
+            {
+                faceLabels = labels.ToArray();
+            }
+            recognizer.Train(faceImages, faceLabels);
+            logger.Info("Trained Face Recognizer");
             timer = new DispatcherTimer();
             timer.Tick += new EventHandler(timer_Tick);
             timer.Interval = new TimeSpan(0, 0, 0, 0, 1);
@@ -86,6 +110,7 @@ namespace Attendance
             timer.Stop();
             capture.Stop();
             capture.Dispose();
+            recognizer.Dispose();
         }
 
         void timer_Tick(object sender, EventArgs e)
@@ -95,29 +120,6 @@ namespace Attendance
             {
                 Image<Gray, Byte> grayFrame = currentFrame.Convert<Gray, Byte>();
                 var detectedFaces = Frontface_Cascade.DetectMultiScale(grayFrame);
-                recognizer = new EigenFaceRecognizer(1, 5000);
-
-                Mat[] faceImages = new Mat[trainingImages.Count];
-                int[] faceLabels = new int[labels.Count];
-
-                for (int i = 0; i < trainingImages.Count; i++)
-                {
-                    var face = Frontface_Cascade.DetectMultiScale(trainingImages[i]);
-                    foreach (var Tface in face)
-                    {
-                        trainingImages[i].ROI = Tface;
-                    }
-                    gray = trainingImages[i].Clone().Resize(200,200,0);
-                     Mat x = gray.Mat;
-                    faceImages[i] = x;
-                }
-
-                for (int i = 0; i < labels.Count; i++)
-                {
-                    faceLabels = labels.ToArray();
-                }
-                recognizer.Train(faceImages, faceLabels);
-                logger.Info("Training Face Recognizer");
                 foreach (var face in detectedFaces)
                 {
                     grayFrame.ROI = face;

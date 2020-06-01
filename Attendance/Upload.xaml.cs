@@ -74,7 +74,6 @@ namespace Attendance
                     {
                         fs.Read(blob, 0, blob.Length);
                     }
-                    file.Delete();
                     connection.Open();
                     string query = "insert into Attendance.dbo.TrainingData ([StudentID],[FullName],[Face]) values(@StudentID,@FullName,@Face)";
                     using (SqlCommand command = new SqlCommand(query, connection))
