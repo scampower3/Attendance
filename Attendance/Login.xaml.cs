@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Data;
 
 namespace Attendance
 {
@@ -44,9 +45,10 @@ namespace Attendance
                 using (SqlConnection connection = new SqlConnection(connectionstring))
                 {
                     connection.Open();
-                    string query = "SELECT * FROM Attendance.dbo.USERS";
+                    string query = "SELECT * FROM Attendance.dbo.USERS where username=@username";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
+                        command.Parameters.Add("@username", SqlDbType.VarChar).Value = username;
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
                             bool match= false;
@@ -58,7 +60,7 @@ namespace Attendance
                                 if (hash == reader.GetString(1) && username == reader.GetString(0))
                                 {
                                     match = true;
-                                    this.NavigationService.Navigate(new FaceRecognition());
+                                    this.NavigationService.Navigate(new Choice());
                                 }
                             }
                             if(match == false)
@@ -78,25 +80,5 @@ namespace Attendance
                 MessageBox.Show("Does not match criteria");
             }
         }
-        static string RandomString(int length)
-        {
-            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder res = new StringBuilder();
-            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
-            {
-                byte[] uintBuffer = new byte[sizeof(uint)];
-
-                while (length-- > 0)
-                {
-                    rng.GetBytes(uintBuffer);
-                    uint num = BitConverter.ToUInt32(uintBuffer, 0);
-                    res.Append(valid[(int)(num % (uint)valid.Length)]);
-                }
-            }
-
-            return res.ToString();
-
-        }
-
     }
 }

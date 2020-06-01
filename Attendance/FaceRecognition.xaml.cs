@@ -22,7 +22,7 @@ using System.Windows.Threading;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Configuration;
-
+using System.Data;
 namespace Attendance
 {
     /// <summary>
@@ -63,16 +63,8 @@ namespace Attendance
                     {
                         while (reader.Read())
                         {
-                            if (!NamePersons.Any() || NamePersons[ContTrain] == reader.GetString(0))
-                            {
-                                labels.Add(NumLabels);
-                            }
-                            else
-                            {
-                                NumLabels++;
-                                labels.Add(NumLabels);
-                            }
-                            NamePersons.Add(reader.GetString(0));
+                            labels.Add(reader.GetInt32(0));
+                            NamePersons.Add(reader.GetString(1));
                             byte[] blob = null;
                             blob = (byte[])reader.GetValue(2);
                             var image = ByteToImage(blob);
@@ -103,7 +95,7 @@ namespace Attendance
                 for (int i = 0; i < trainingImages.Count; i++)
                 {
                     var face = Frontface_Cascade.DetectMultiScale(trainingImages[i]);
-                    foreach (var Tface in detectedFaces)
+                    foreach (var Tface in face)
                     {
                         trainingImages[i].ROI = Tface;
                     }
@@ -123,9 +115,25 @@ namespace Attendance
                     grayFrame.ROI = face;
                     currentFrame.Draw(face, new Bgr(0, double.MaxValue, 0), 3);                        
                     logger.Info("Drawing Rectangle Outline of Face");
-                    textbox1.Text = NamePersons[recognizer.Predict(grayFrame.Resize(200,200,0)).Label];
+                    int predictresult = recognizer.Predict(grayFrame.Resize(200, 200, 0)).Label;
+                    var connectionstring = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
+                    using (SqlConnection connection = new SqlConnection(connectionstring))
+                    {
+                        connection.Open();
+                        string query = "SELECT * FROM Attendance.dbo.TrainingData where StudentID = @studentid";
+                        using (SqlCommand command = new SqlCommand(query, connection))
+                        {
+                            command.Parameters.Add("@studentid", SqlDbType.Int).Value = predictresult;
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    textbox1.Text = reader.GetString(1);
+                                }
+                            }
+                        }
+                    }
                 }
-
                 image1.Source = ToBitmapSource(currentFrame);
             }
         }

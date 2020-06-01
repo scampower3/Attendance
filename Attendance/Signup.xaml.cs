@@ -42,7 +42,8 @@ namespace Attendance
             if (password != "" && username != "" && Regex.IsMatch(password, MatchPasswordPattern) == true)
             {
                 bool success = true;
-                string salt = RandomString(32);
+                RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+                string salt = Generatesalt(rng, 32);
                 Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, Convert.FromBase64String(salt), 100000);
                 string hash = Convert.ToBase64String(pbkdf2.GetBytes(32));
                 var connectionstring = ConfigurationManager.ConnectionStrings["Test"].ConnectionString;
@@ -79,23 +80,11 @@ namespace Attendance
                 MessageBox.Show("Does not match criteria");
             }
         }
-        static string RandomString(int length)
+        static string Generatesalt(RNGCryptoServiceProvider rng, int size)
         {
-            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-            StringBuilder res = new StringBuilder();
-            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
-            {
-                byte[] uintBuffer = new byte[sizeof(uint)];
-
-                while (length-- > 0)
-                {
-                    rng.GetBytes(uintBuffer);
-                    uint num = BitConverter.ToUInt32(uintBuffer, 0);
-                    res.Append(valid[(int)(num % (uint)valid.Length)]);
-                }
-            }
-
-            return res.ToString();
+            var bytes = new Byte[size];
+            rng.GetBytes(bytes);
+            return Convert.ToBase64String(bytes);
 
         }
     }
