@@ -87,5 +87,10 @@ namespace Attendance
             return Convert.ToBase64String(bytes);
 
         }
+
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Login());
+        }
     }
 }

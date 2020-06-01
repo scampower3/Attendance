@@ -86,6 +86,9 @@ namespace Attendance
                         {
                             command.ExecuteNonQuery();
                             MessageBox.Show("Upload Successful");
+                            StudentID.Text = "";
+                            StudentName.Text = "";
+                            Filepath.Text = "";
                         }
                         catch (Exception ex)
                         {

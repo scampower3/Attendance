@@ -13,5 +13,7 @@
         <PasswordBox x:Name="Password" HorizontalAlignment="Left" Height="23" Margin="289,251,0,0" VerticalAlignment="Top" Width="120" />
         <Button x:Name="CreateUser" Content="Create User" HorizontalAlignment="Left" Margin="335,304,0,0" VerticalAlignment="Top" Width="75" Click="CreateUser_Click"/>
         <Button x:Name="Signin" Content="Sign in" HorizontalAlignment="Left" Margin="255,304,0,0" VerticalAlignment="Top" Width="75" Click="Signin_Click"/>
+        <TextBlock HorizontalAlignment="Left" Height="16" Margin="231,251,0,0" TextWrapping="Wrap" Text="Password:" VerticalAlignment="Top" Width="58"/>
+        <TextBlock HorizontalAlignment="Left" Height="16" Margin="231,204,0,0" TextWrapping="Wrap" Text="Username:" VerticalAlignment="Top" Width="58"/>
     </Grid>
 </Page>

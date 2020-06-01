@@ -8,7 +8,8 @@
         Title="FaceRecognition" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
         <Image Name="image1" Stretch="Fill" Margin="0,0,162.6,62" />
-        <TextBox Name ="textbox1"  HorizontalAlignment="Left" Height="23" Margin="355,358,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name ="textbox1"  HorizontalAlignment="Left" Height="23" Margin="357,393,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120" IsReadOnly="True" />
         <Button Name="Back" Content="Back" HorizontalAlignment="Left" Margin="642,362,0,0" VerticalAlignment="Top" Width="75" Click="Back_Click"/>
+        <TextBlock HorizontalAlignment="Left" Margin="303,393,0,0" TextWrapping="Wrap" Text="Name:" VerticalAlignment="Top"/>
     </Grid>
 </Page>

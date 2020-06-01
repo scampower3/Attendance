@@ -11,10 +11,13 @@
     <Grid>
         <TextBox x:Name="StudentID" HorizontalAlignment="Left" Height="23" Margin="253,152,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="StudentName" HorizontalAlignment="Left" Height="23" Margin="253,186,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Filepath" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="253,218,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Filepath" IsReadOnly="True" HorizontalAlignment="Left" Height="23" Margin="253,218,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="240"/>
         <Button x:Name="UploadFile" Content="Upload" HorizontalAlignment="Left" Margin="279,270,0,0" VerticalAlignment="Top" Width="75" Click="UploadFile_Click"/>
-        <Button x:Name="Browse"  Content="Browse" HorizontalAlignment="Left" Margin="413,224,0,0" VerticalAlignment="Top" Width="75" Click="Browse_Click"/>
+        <Button x:Name="Browse"  Content="Browse" HorizontalAlignment="Left" Margin="506,219,0,0" VerticalAlignment="Top" Width="75" Click="Browse_Click"/>
         <Button x:Name="Back" Content="Back" HorizontalAlignment="Left" Margin="279,318,0,0" VerticalAlignment="Top" Width="75" Click="Back_Click"/>
+        <TextBlock HorizontalAlignment="Left" Height="16" Margin="190,218,0,0" TextWrapping="Wrap" Text="File Path:" VerticalAlignment="Top" Width="58" RenderTransformOrigin="0.217,-0.337"/>
+        <TextBlock HorizontalAlignment="Left" Height="16" Margin="190,189,0,0" TextWrapping="Wrap" Text="Name:" VerticalAlignment="Top" Width="58" RenderTransformOrigin="0.217,-0.337"/>
+        <TextBlock HorizontalAlignment="Left" Height="16" Margin="175,154,0,0" TextWrapping="Wrap" Text="Student ID:" VerticalAlignment="Top" Width="73" RenderTransformOrigin="0.217,-0.337"/>
 
     </Grid>
 </Page>
