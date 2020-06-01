@@ -95,5 +95,10 @@ namespace Attendance
                 }
             }
         }
+
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Choice());
+        }
     }
 }

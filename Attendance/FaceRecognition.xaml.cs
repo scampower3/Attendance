@@ -80,6 +80,14 @@ namespace Attendance
             timer.Start();
         }
 
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Choice());
+            timer.Stop();
+            capture.Stop();
+            capture.Dispose();
+        }
+
         void timer_Tick(object sender, EventArgs e)
         {
             Image<Bgr, Byte> currentFrame = capture.QueryFrame().ToImage<Bgr,Byte>();

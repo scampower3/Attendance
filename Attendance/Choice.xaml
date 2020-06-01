@@ -11,6 +11,7 @@
     <Grid>
         <Button x:Name="Face" Content="Do Face Recognition" HorizontalAlignment="Left" Margin="340,128,0,0" VerticalAlignment="Top" Width="136" Click="Face_Click" Height="22"/>
         <Button x:Name="Upload" Content="Upload Photo" HorizontalAlignment="Left" Margin="340,189,0,0" VerticalAlignment="Top" Width="136" Click="Upload_Click" Height="21"/>
+        <Button x:Name="SignOut" Content="Sign Out" HorizontalAlignment="Left" Margin="340,247,0,0" VerticalAlignment="Top" Width="136" Click="SignOut_Click" Height="21"/>
 
     </Grid>
 </Page>

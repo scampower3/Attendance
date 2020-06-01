@@ -34,5 +34,10 @@ namespace Attendance
         {
             this.NavigationService.Navigate(new Upload());
         }
+
+        private void SignOut_Click(object sender, RoutedEventArgs e)
+        {
+            this.NavigationService.Navigate(new Login());
+        }
     }
 }
