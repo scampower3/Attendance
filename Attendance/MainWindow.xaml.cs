@@ -23,6 +23,7 @@ namespace Attendance
         {
             InitializeComponent();
             _mainFrame.Navigate(new Login());
+            
         }
     }
 }
